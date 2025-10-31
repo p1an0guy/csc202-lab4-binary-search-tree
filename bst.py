@@ -62,3 +62,24 @@ def insert(bst: BinarySearchTree, n: Any) -> BinarySearchTree:
     return BinarySearchTree(
         bst.comes_before, bin_tree_builder(bst.comes_before, bst.BinTree, n)
     )
+
+
+# returns True if given value is in the BST, False otherwise
+def lookup(bst: BinarySearchTree, target: Any) -> bool:
+
+    # helper function to loop through the actual BinTree
+    def lookup_helper(
+        comes_before: Callable[[Any, Any], bool], bt: BinTree, target: Any
+    ) -> bool:
+        match bt:
+            case None:
+                return False
+            case Node(val, left, right):
+                if comes_before(target, val):
+                    return lookup_helper(comes_before, left, target)
+                elif comes_before(val, target):
+                    return lookup_helper(comes_before, right, target)
+                else:
+                    return True
+
+    return lookup_helper(bst.comes_before, bst.BinTree, target)
