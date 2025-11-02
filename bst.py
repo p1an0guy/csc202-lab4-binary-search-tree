@@ -175,5 +175,14 @@ class BstTests(unittest.TestCase):
     def test_insert2(self) -> None:
         self.assertEqual(insert(BinarySearchTree(numeric_lt, None), 1), BinarySearchTree(numeric_lt, Node(1, None, None)))
 
+    def test_lookup1(self) -> None:
+        self.assertEqual(lookup(bst1, 3), True)
+    
+    def test_lookup2(self) -> None:
+        self.assertEqual(lookup(bst1, 2), False)
+    
+    def test_lookup3(self) -> None:
+        self.assertEqual(lookup(BinarySearchTree(numeric_lt, None), 1), False)
+
 if __name__ == '__main__':
     unittest.main()
