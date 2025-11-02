@@ -4,6 +4,7 @@ from re import search
 from sqlite3 import Binary
 import sys
 # from tkinter import W
+from unicodedata import numeric
 import unittest
 from typing import *
 from dataclasses import dataclass
@@ -98,13 +99,13 @@ def search_and_destroy(
 ) -> BinTree:
     match bt:
         case None:
-            return None
+            raise ValueError("Error: Attempted deletion from empty Binary Search Tree")
         case Node(val, left, right):
             if cb(target, val):
                 return Node(val, search_and_destroy(left, cb, target), right)
             if cb(val, target):
                 return Node(val, left, search_and_destroy(right, cb, target))
-            delete_root(bt, cb)
+            return delete_root(bt, cb)
 
 
 # deletes root value from BST, replacing w/ largest value in left subtree
@@ -159,6 +160,40 @@ def numeric_lt(n1: int, n2: int) -> bool:
 
 bt1: BinTree = Node(3, Node(1, None, None), Node(5, None, None))
 bst1: BinarySearchTree = BinarySearchTree(numeric_lt, bt1)
+bt2: BinTree = Node(5,
+                    Node(3,
+                            Node(1, None,
+                                 Node(2, None, None)),
+                            Node(4, None, None)),
+                    Node(8,
+                         Node(7,
+                              Node(6, None, None),
+                              Node(9, None,
+                                   Node(10, None, None))),
+                         None))
+bst2: BinarySearchTree = BinarySearchTree(numeric_lt, bt2)
+bt2_after_delete6: BinTree = Node(5,
+                    Node(3,
+                            Node(1, None,
+                                 Node(2, None, None)),
+                            Node(4, None, None)),
+                    Node(8,
+                         Node(7,
+                              None,
+                              Node(9, None,
+                                   Node(10, None, None))),
+                         None))
+
+bt2_after_delete3: BinTree = Node(5,
+                    Node(2,
+                            Node(1, None, None),
+                            Node(4, None, None)),
+                    Node(8,
+                         Node(7,
+                              Node(6, None, None),
+                              Node(9, None,
+                                   Node(10, None, None))),
+                         None))
 
 class BstTests(unittest.TestCase):
     def test_is_empty1(self) -> None:
@@ -183,6 +218,15 @@ class BstTests(unittest.TestCase):
     
     def test_lookup3(self) -> None:
         self.assertEqual(lookup(BinarySearchTree(numeric_lt, None), 1), False)
+
+    def test_delete1(self) -> None:
+        self.assertEqual(delete(bst1, 3), BinarySearchTree(numeric_lt, Node(1, None, Node(5, None, None))))
+    
+    def test_delete2(self) -> None:
+        self.assertEqual(delete(bst2, 6), BinarySearchTree(numeric_lt, bt2_after_delete6))
+
+    def test_delete3(self) -> None:
+        self.assertEqual(delete(bst2, 3), BinarySearchTree(numeric_lt, bt2_after_delete3)) 
 
 if __name__ == '__main__':
     unittest.main()
