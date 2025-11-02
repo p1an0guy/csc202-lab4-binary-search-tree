@@ -3,7 +3,7 @@ from multiprocessing import Value
 from re import search
 from sqlite3 import Binary
 import sys
-from tkinter import W
+# from tkinter import W
 import unittest
 from typing import *
 from dataclasses import dataclass
@@ -152,3 +152,28 @@ def delete_leftmost_child(bt: BinTree) -> BinTree:
                 return Node(val, delete_leftmost_child(left), right)
             # if there is no subtree, we've reached the leftmost child and can delete
             return None
+
+# defining example comes_before fns and bst's for the test cases
+def numeric_lt(n1: int, n2: int) -> bool:
+    return n1 < n2
+
+bt1: BinTree = Node(3, Node(1, None, None), Node(5, None, None))
+bst1: BinarySearchTree = BinarySearchTree(numeric_lt, bt1)
+
+class BstTests(unittest.TestCase):
+    def test_is_empty1(self) -> None:
+        self.assertEqual(is_empty(BinarySearchTree(numeric_lt, None)), True)
+    
+    def test_is_empty2(self) -> None:
+        self.assertEqual(is_empty(BinarySearchTree(numeric_lt, Node(1,
+                                                                    Node(2, None, None),
+                                                                    Node(3, None, None)))),
+                         False)
+    def test_insert1(self) -> None:
+        self.assertEqual(insert(bst1, 2), BinarySearchTree(numeric_lt, Node(3, Node(1, None, Node(2, None, None)), Node(5, None, None))))
+                                                        
+    def test_insert2(self) -> None:
+        self.assertEqual(insert(BinarySearchTree(numeric_lt, None), 1), BinarySearchTree(numeric_lt, Node(1, None, None)))
+
+if __name__ == '__main__':
+    unittest.main()
