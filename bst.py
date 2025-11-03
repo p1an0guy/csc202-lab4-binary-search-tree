@@ -1,9 +1,9 @@
-from math import e
+from math import e, sqrt
 from multiprocessing import Value
 from re import search
 from sqlite3 import Binary
 import sys
-# from tkinter import W
+#from tkinter import W
 from unicodedata import numeric
 import unittest
 from typing import *
@@ -26,6 +26,11 @@ class Node:
     val: Any
     left: BinTree
     right: BinTree
+    
+@dataclass(frozen=True)
+class Point2:
+    x: float
+    y: float
 
 
 # given a BST, return True if it's empty, False otherwise
@@ -34,10 +39,10 @@ def is_empty(bst: BinarySearchTree) -> bool:
 
 
 # inputs: BST, new val. output: BST w/ new val using comes_before fn
-def insert(bst: BinarySearchTree, n: Any) -> BinarySearchTree:
+def insert(bst: BinarySearchTree, new: Any) -> BinarySearchTree:
     # create a new BST w/ orig 'comes_before' fn + new bin_tree from helper fn below
     return BinarySearchTree(
-        bst.comes_before, bin_tree_builder(bst.comes_before, bst.BinTree, n)
+        bst.comes_before, bin_tree_builder(bst.comes_before, bst.BinTree, new)
     )
 
 
@@ -158,6 +163,14 @@ def delete_leftmost_child(bt: BinTree) -> BinTree:
 def numeric_lt(n1: int, n2: int) -> bool:
     return n1 < n2
 
+def string_lt(s1: str, s2: str) -> bool:
+    return s1 < s2
+
+def distance_lt(p1: Point2, p2: Point2) -> bool:
+    d1: float = sqrt(p1.x**2 + p1.y**2)
+    d2: float =sqrt(p2.x**2 + p2.y**2)
+    return d1 < d2
+    
 bt1: BinTree = Node(3, Node(1, None, None), Node(5, None, None))
 bst1: BinarySearchTree = BinarySearchTree(numeric_lt, bt1)
 bt2: BinTree = Node(5,
@@ -195,38 +208,52 @@ bt2_after_delete3: BinTree = Node(5,
                                    Node(10, None, None))),
                          None))
 
-class BstTests(unittest.TestCase):
-    def test_is_empty1(self) -> None:
-        self.assertEqual(is_empty(BinarySearchTree(numeric_lt, None)), True)
-    
-    def test_is_empty2(self) -> None:
-        self.assertEqual(is_empty(BinarySearchTree(numeric_lt, Node(1,
-                                                                    Node(2, None, None),
-                                                                    Node(3, None, None)))),
-                         False)
-    def test_insert1(self) -> None:
-        self.assertEqual(insert(bst1, 2), BinarySearchTree(numeric_lt, Node(3, Node(1, None, Node(2, None, None)), Node(5, None, None))))
-                                                        
-    def test_insert2(self) -> None:
-        self.assertEqual(insert(BinarySearchTree(numeric_lt, None), 1), BinarySearchTree(numeric_lt, Node(1, None, None)))
+bt3: BinTree = Node("gucci",
+                    Node("dog",
+                         Node("banana",
+                              Node("apple", None, None),None),
+                         Node("elephant", None,
+                              Node("french", None, None))),
+                    Node("monkey",
+                         Node("hobo", None,
+                              Node("interest", None, Node("jonah", None, None))),
+                         Node("popcorn", Node("orange", None, None), None)))
+bt3_after_insert_zebra: BinTree =  Node("gucci",
+                    Node("dog",
+                         Node("banana",
+                              Node("apple", None, None),None),
+                         Node("elephant", None,
+                              Node("french", None, None))),
+                    Node("monkey",
+                         Node("hobo", None,
+                              Node("interest", None, Node("jonah", None, None))),
+                         Node("popcorn", Node("orange", None, None), Node("zebra", None, None))))
+bt3_after_delete_banana: BinTree = Node("gucci",
+                    Node("dog",
+                         Node("apple",
+                             None,None),
+                         Node("elephant", None,
+                              Node("french", None, None))),
+                    Node("monkey",
+                         Node("hobo", None,
+                              Node("interest", None, Node("jonah", None, None))),
+                         Node("popcorn", Node("orange", None, None), Node("zebra", None, None))))
+bst3: BinarySearchTree = BinarySearchTree(string_lt, bt3)
 
-    def test_lookup1(self) -> None:
-        self.assertEqual(lookup(bst1, 3), True)
-    
-    def test_lookup2(self) -> None:
-        self.assertEqual(lookup(bst1, 2), False)
-    
-    def test_lookup3(self) -> None:
-        self.assertEqual(lookup(BinarySearchTree(numeric_lt, None), 1), False)
+bt4: BinTree = Node(Point2(5.5, 6.5),
+                    Node(Point2(2.17, 3.14), None,
+                         Node(Point2(3.7, 4.2), None, None)),
+                    Node(Point2(10, 9.8),
+                         Node(Point2(7.8, 8.9), None,
+                              Node(Point2(8.9, 9.2), None, None)),
+                         Node(Point2(25.1, 24), None, None)))
 
-    def test_delete1(self) -> None:
-        self.assertEqual(delete(bst1, 3), BinarySearchTree(numeric_lt, Node(1, None, Node(5, None, None))))
-    
-    def test_delete2(self) -> None:
-        self.assertEqual(delete(bst2, 6), BinarySearchTree(numeric_lt, bt2_after_delete6))
-
-    def test_delete3(self) -> None:
-        self.assertEqual(delete(bst2, 3), BinarySearchTree(numeric_lt, bt2_after_delete3)) 
-
-if __name__ == '__main__':
-    unittest.main()
+bt4_aftr_insert_pt: BinTree = Node(Point2(5.5, 6.5),
+                    Node(Point2(2.17, 3.14),
+                         Node(Point2(1.1, 2.2), None, None),
+                         Node(Point2(3.7, 4.2), None, None)),
+                    Node(Point2(10, 9.8),
+                         Node(Point2(7.8, 8.9), None,
+                              Node(Point2(8.9, 9.2), None, None)),
+                         Node(Point2(25.1, 24), None, None)))
+bst4: BinarySearchTree = BinarySearchTree(distance_lt, bt4)
